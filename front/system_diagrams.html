@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Diagrams: Robotic Arm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            flowchart: { curve: 'basis' }
+        });
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Cairo', sans-serif; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn.active { border-bottom-color: #3b82f6; color: #1d4ed8; font-weight: 600; }
+        
+        /* Kinematic Animations */
+        /* Card 1 */
+        .anim-base { animation: baseOnly 4s infinite ease-in-out; }
+        /* Card 2 */
+        .anim-shoulder { animation: shoulderOnly 4s infinite ease-in-out; }
+        /* Card 3 */
+        .anim-elbow { animation: elbowOnly 4s infinite ease-in-out; }
+        /* Card 4 */
+        .anim-wrist { animation: wristOnly 4s infinite ease-in-out; }
+        .anim-grip-l { animation: gripLeft 4s infinite ease-in-out; }
+        .anim-grip-r { animation: gripRight 4s infinite ease-in-out; }
+        
+        /* Card 5 Full Sequence (8 seconds) - Perfectly Synchronized */
+        .full-base { animation: fullBase 8s infinite ease-in-out; }
+        .full-shoulder-side { animation: fullShoulderSide 8s infinite ease-in-out; }
+        .full-elbow-side { animation: fullElbowSide 8s infinite ease-in-out; }
+        .full-wrist-side { animation: fullWristSide 8s infinite ease-in-out; }
+        .full-grip-l { animation: fullGripL 8s infinite ease-in-out; }
+        .full-grip-r { animation: fullGripR 8s infinite ease-in-out; }
+        .full-table-ball { animation: tableBallVis 8s infinite; }
+        .full-held-ball { animation: gripBallVis 8s infinite; }
+        .full-bin-ball { animation: binBallVis 8s infinite; }
+
+        @keyframes baseOnly { 0%, 100% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } }
+        @keyframes shoulderOnly { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(60deg); } }
+        @keyframes elbowOnly { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-80deg); } }
+        @keyframes wristOnly { 0%, 100% { transform: rotate(-40deg); } 50% { transform: rotate(40deg); } }
+        @keyframes gripLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(8px); } }
+        @keyframes gripRight { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-8px); } }
+
+        @keyframes fullBase {
+            0%, 45% { transform: rotate(0deg); }
+            55%, 85% { transform: rotate(-60deg); }
+            95%, 100% { transform: rotate(0deg); }
+        }
+
+        /* Mathematically precise IK keyframes for reaching x=358, y=290 from 150,250 */
+        @keyframes fullShoulderSide {
+            0%, 10%, 95%, 100% { transform: rotate(60deg); }   /* Home / High Hold */
+            25%, 35% { transform: rotate(120deg); }             /* Lower to grab exactly at table */
+            45%, 85% { transform: rotate(60deg); }              /* Lift and hold while base rotates */
+        }
+        @keyframes fullElbowSide {
+            0%, 10%, 95%, 100% { transform: rotate(-120deg); }  /* Tucked in */
+            25%, 35% { transform: rotate(-60deg); }             /* Extended out */
+            45%, 85% { transform: rotate(-120deg); }            /* Tucked in */
+        }
+        @keyframes fullWristSide {
+            0%, 10%, 95%, 100% { transform: rotate(60deg); }    /* Counter-rotate to point DOWN (60-120+60 = 0) */
+            25%, 35% { transform: rotate(-60deg); }             /* Counter-rotate to point DOWN (120-60-60 = 0) */
+            45%, 85% { transform: rotate(60deg); }              /* Counter-rotate to point DOWN */
+        }
+        @keyframes fullGripL {
+            0%, 20% { transform: translateX(0); }               /* Open */
+            30%, 75% { transform: translateX(5px); }            /* Close */
+            85%, 100% { transform: translateX(0); }             /* Drop */
+        }
+        @keyframes fullGripR {
+            0%, 20% { transform: translateX(0); } 
+            30%, 75% { transform: translateX(-5px); } 
+            85%, 100% { transform: translateX(0); } 
+        }
+        @keyframes tableBallVis { 
+            0%, 29% { opacity: 1; } 
+            30%, 100% { opacity: 0; } 
+        }
+        @keyframes gripBallVis { 
+            0%, 29% { opacity: 0; } 
+            30%, 79% { opacity: 1; } 
+            80%, 100% { opacity: 0; } 
+        }
+        @keyframes binBallVis { 
+            0%, 79% { opacity: 0; transform: translateY(-20px); } 
+            80%, 95% { opacity: 1; transform: translateY(0); } 
+            96%, 100% { opacity: 0; } 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-10">
+                    <h1 class="text-2xl font-bold text-gray-900">Robotics Arm <span class="text-gray-400 font-normal">| المشروع</span></h1>
+                    <nav class="flex space-x-6">
+                        <a href="team_dashboard.html" class="text-gray-500 hover:text-blue-600 font-medium transition-colors">Team Dashboard</a>
+                        <a href="system_diagrams.html" class="text-blue-600 font-bold border-b-2 border-blue-600">System Diagrams</a>
+                    </nav>
+                </div>
+                <div class="flex space-x-1">
+                    <button onclick="switchTab('data-flow')" id="btn-data-flow" class="tab-btn active px-4 py-2 border-b-2 border-blue-500 text-blue-700 hover:text-blue-800 transition-colors">
+                        Data Flow <br><span class="text-xs font-normal text-gray-500">تدفق البيانات</span>
+                    </button>
+                    <button onclick="switchTab('photo')" id="btn-photo" class="tab-btn px-4 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition-colors">
+                        System Animations <br><span class="text-xs font-normal text-gray-500">متحركات النظام</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Data Flow Diagram -->
+        <section id="data-flow" class="tab-content active">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Technical Data Flow (التدفق التقني للبيانات)</h2>
+                    <p class="text-gray-500 text-sm mt-1">Shows how data, signals, and power flow between the 5 main subsystems.</p>
+                </div>
+                <div class="overflow-x-auto flex justify-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <pre class="mermaid">
+graph TD
+    %% Host PC
+    subgraph Host["Host PC / Raspberry Pi (الحاسوب المضيف)"]
+        OpenCV["Computer Vision\n(OpenCV)"]
+        Planner["Kinematics & Planner\n(PyBullet / Math)"]
+        OpenCV --"Target (X,Y,Color)\n(إحداثيات الهدف)"--> Planner
+    end
+
+    %% Power Subsystem
+    subgraph Power["Power Supply (مزود الطاقة)"]
+        AC["AC Mains 220V"] --> PS12V["12V/24V Power Supply\n(طاقة المحركات)"]
+        AC --> PS5V["5V Buck Converter\n(طاقة المنطق)"]
+        E_Stop["Emergency Stop Relay\n(مرحل التوقف الطارئ)"]
+        PS12V --> E_Stop
+    end
+
+    %% Vision Subsystem
+    subgraph Vision["Vision Hardware (عتاد الرؤية)"]
+        Cam["Fixed Overhead Camera\n(كاميرا علوية ثابتة)"]
+    end
+
+    %% Embedded Subsystem
+    subgraph Embedded["Embedded Hardware (الأنظمة المدمجة)"]
+        Arduino["Arduino Controller\n(وحدة التحكم الأردوينو)"]
+        Drivers["Motor Drivers\n(مشغلات المحركات)"]
+        Arduino --"Step/Dir Signals\n(إشارات الحركة)"--> Drivers
+    end
+
+    %% Structure Subsystem
+    subgraph Structure["Structure (الهيكل)"]
+        Motors["Stepper/Servo Motors\n(المحركات)"]
+        Gripper["End Effector / Gripper\n(القابض)"]
+        Frame["Physical Frame & Mounts\n(الهيكل والحوامل)"]
+    end
+
+    %% Inter-System Data Connections
+    Cam -->|"USB Video Stream<br>(بث الفيديو)"| OpenCV
+    Planner -->|"USB Serial Commands<br>(أوامر تسلسلية)"| Arduino
+    Planner -.->|"Virtual Simulation<br>(محاكاة افتراضية)"| Planner
+    Drivers -->|"High Current<br>(تيار عالي)"| Motors
+    Arduino -->|"PWM Signal<br>(إشارة النبض)"| Gripper
+
+    %% Power Connections
+    PS5V -.->|"5V Logic Power"| Host
+    PS5V -.->|"5V Logic Power"| Arduino
+    E_Stop -.->|"12V/24V Switched Power<br>(طاقة قابلة للقطع)"| Drivers
+
+    %% Physical Constraints
+    Frame -.->|"Fixed Camera Mount"| Cam
+    Frame -.->|"Rigid Base"| Motors
+                    </pre>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">High-Level Architecture (البنية المعمارية العامة)</h3>
+                    <div class="flex justify-center bg-gray-50 rounded-lg border border-gray-100 p-4">
+                        <img src="assets/dataFlow.png" alt="Data Flow Architecture" class="max-w-full h-auto rounded-md shadow-sm border border-gray-200">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- System Animations -->
+        <section id="photo" class="tab-content">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Degrees of Freedom (DOF) Analysis</h2>
+                    <p class="text-gray-500 text-sm mt-1">Detailed breakdown of each joint's movement, culminating in a full integration sequence.</p>
+                </div>
+                
+                <div class="space-y-8">
+                    
+                    <!-- DOF 1: Base -->
+                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col md:flex-row gap-6 items-center shadow-sm">
+                        <div class="md:w-1/3">
+                            <span class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs font-bold rounded mb-2">TOP VIEW</span>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">DOF 1: Base Yaw (القاعدة)</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">The foundation of the arm. It rotates horizontally (pan) to aim the entire arm structure towards different coordinates in the workspace, allowing it to reach the various colored sorting bins.</p>
+                        </div>
+                        <div class="md:w-2/3 w-full bg-gray-900 rounded-lg p-2 flex justify-center overflow-hidden h-64 border border-gray-800">
+                            <!-- Top View SVG -->
+                            <svg viewBox="0 0 500 300" class="h-full" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="50" y="50" width="400" height="200" fill="#334155" rx="5" />
+                                <rect x="80" y="70" width="40" height="40" fill="#ef4444" rx="3" />
+                                <rect x="230" y="70" width="40" height="40" fill="#22c55e" rx="3" />
+                                <rect x="380" y="70" width="40" height="40" fill="#3b82f6" rx="3" />
+                                <g transform="translate(250, 250)">
+                                    <circle cx="0" cy="0" r="30" fill="#1e293b" />
+                                    <g class="anim-base">
+                                        <rect x="-15" y="-140" width="30" height="140" fill="#64748b" rx="5" />
+                                        <circle cx="0" cy="-140" r="15" fill="#1e293b" />
+                                        <rect x="-10" y="-220" width="20" height="80" fill="#94a3b8" rx="5" />
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- DOF 2: Shoulder -->
+                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col md:flex-row gap-6 items-center shadow-sm">
+                        <div class="md:w-1/3">
+                            <span class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs font-bold rounded mb-2">SIDE VIEW</span>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">DOF 2: Shoulder Pitch (الكتف)</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Lifts and lowers the entire arm. This is the primary joint for vertical reach, requiring the highest torque from the power supply to overcome gravity and lift the payload.</p>
+                        </div>
+                        <div class="md:w-2/3 w-full bg-gray-900 rounded-lg p-2 flex justify-center overflow-hidden h-64 border border-gray-800">
+                            <svg viewBox="0 0 500 300" class="h-full" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="50" y="250" width="400" height="10" fill="#334155" />
+                                <g transform="translate(150, 220)">
+                                    <path d="M -20 30 L 20 30 L 10 -10 L -10 -10 Z" fill="#475569" />
+                                    <circle cx="0" cy="0" r="15" fill="#1e293b" />
+                                    <g class="anim-shoulder">
+                                        <rect x="-10" y="-100" width="20" height="100" fill="#94a3b8" rx="5" />
+                                        <!-- Static Elbow for this demo -->
+                                        <g transform="translate(0, -100)">
+                                            <circle cx="0" cy="0" r="10" fill="#1e293b" />
+                                            <g transform="rotate(-60)"><rect x="-8" y="-80" width="16" height="80" fill="#cbd5e1" rx="4" /></g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- DOF 3: Elbow -->
+                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col md:flex-row gap-6 items-center shadow-sm">
+                        <div class="md:w-1/3">
+                            <span class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs font-bold rounded mb-2">SIDE VIEW</span>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">DOF 3: Elbow Pitch (الكوع)</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">Extends and retracts the forearm independently of the shoulder. Works dynamically together with the shoulder to position the end-effector at specific (X,Y) coordinates calculated by Inverse Kinematics.</p>
+                        </div>
+                        <div class="md:w-2/3 w-full bg-gray-900 rounded-lg p-2 flex justify-center overflow-hidden h-64 border border-gray-800">
+                            <svg viewBox="0 0 500 300" class="h-full" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="50" y="250" width="400" height="10" fill="#334155" />
+                                <g transform="translate(150, 220)">
+                                    <path d="M -20 30 L 20 30 L 10 -10 L -10 -10 Z" fill="#475569" />
+                                    <circle cx="0" cy="0" r="15" fill="#1e293b" />
+                                    <g transform="rotate(30)">
+                                        <rect x="-10" y="-100" width="20" height="100" fill="#94a3b8" rx="5" />
+                                        <g transform="translate(0, -100)">
+                                            <circle cx="0" cy="0" r="10" fill="#1e293b" />
+                                            <!-- Animated Elbow -->
+                                            <g class="anim-elbow">
+                                                <rect x="-8" y="-80" width="16" height="80" fill="#cbd5e1" rx="4" />
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- DOF 4: Wrist & Gripper -->
+                    <div class="bg-gray-50 rounded-xl p-6 border border-gray-100 flex flex-col md:flex-row gap-6 items-center shadow-sm">
+                        <div class="md:w-1/3">
+                            <span class="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs font-bold rounded mb-2">SIDE VIEW (ZOOM)</span>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">DOF 4: Wrist & Gripper (الرسغ والقابض)</h3>
+                            <p class="text-gray-600 text-sm leading-relaxed">The wrist joint pitches to keep the payload level with the ground, while the servo-actuated gripper opens and closes to physically grasp and release the sorted objects.</p>
+                        </div>
+                        <div class="md:w-2/3 w-full bg-gray-900 rounded-lg p-2 flex justify-center overflow-hidden h-64 border border-gray-800">
+                            <svg viewBox="0 0 500 300" class="h-full" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Zoomed in view of wrist -->
+                                <g transform="translate(250, 150) scale(1.5)">
+                                    <rect x="-8" y="-100" width="16" height="100" fill="#cbd5e1" rx="4" />
+                                    <g transform="translate(0, -100)">
+                                        <circle cx="0" cy="0" r="10" fill="#1e293b" />
+                                        <g class="anim-wrist">
+                                            <rect x="-15" y="-10" width="30" height="20" fill="#475569" />
+                                            <!-- Left Jaw -->
+                                            <g class="anim-grip-l"><rect x="-15" y="10" width="6" height="30" fill="#94a3b8" rx="2" /></g>
+                                            <!-- Right Jaw -->
+                                            <g class="anim-grip-r"><rect x="9" y="10" width="6" height="30" fill="#94a3b8" rx="2" /></g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Full Integration Sequence -->
+                    <div class="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 shadow-md">
+                        <span class="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full mb-3 shadow-sm">FINAL INTEGRATION</span>
+                        <h3 class="text-2xl font-extrabold text-blue-900 mb-2">Pick & Place Sequence (عملية التقاط ووضع كاملة)</h3>
+                        <p class="text-blue-800 text-sm mb-6 max-w-3xl">This sequence demonstrates all 4 degrees of freedom working together seamlessly. Watch how the side view kinematics perfectly touch the object, lift it, and the top view base yaw rotates to place it in the target bin.</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <!-- Side View Panel -->
+                            <div class="bg-gray-900 rounded-xl p-2 flex flex-col justify-center overflow-hidden h-80 border border-gray-800 relative">
+                                <span class="absolute top-2 left-2 text-[10px] text-gray-500 font-bold uppercase z-10">Side View (Kinematics)</span>
+                                <svg viewBox="0 0 500 400" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Table -->
+                                    <rect x="0" y="300" width="500" height="100" fill="#334155" />
+                                    
+                                    <!-- Target Ball -->
+                                    <circle cx="358" cy="290" r="10" fill="#facc15" class="full-table-ball" />
+                                    
+                                    <!-- Robot Base (Pivot at 150, 250) -->
+                                    <g transform="translate(150, 250)">
+                                        <path d="M -30 50 L 30 50 L 20 0 L -20 0 Z" fill="#475569" />
+                                        <circle cx="0" cy="0" r="15" fill="#1e293b" />
+                                        
+                                        <!-- Shoulder (Link 1 = 120px) -->
+                                        <g class="full-shoulder-side">
+                                            <rect x="-12" y="-120" width="24" height="120" fill="#94a3b8" rx="10" />
+                                            <circle cx="0" cy="0" r="12" fill="#1e293b" />
+                                            
+                                            <!-- Elbow (Link 2 = 120px) -->
+                                            <g transform="translate(0, -120)">
+                                                <g class="full-elbow-side">
+                                                    <rect x="-10" y="-120" width="20" height="120" fill="#cbd5e1" rx="8" />
+                                                    <circle cx="0" cy="0" r="10" fill="#1e293b" />
+                                                    
+                                                    <!-- Wrist & Gripper (Length = 40px) -->
+                                                    <g transform="translate(0, -120)">
+                                                        <g class="full-wrist-side">
+                                                            <rect x="-15" y="0" width="30" height="20" fill="#475569" />
+                                                            <g class="full-grip-l"><rect x="-15" y="10" width="6" height="30" fill="#94a3b8" rx="2" /></g>
+                                                            <g class="full-grip-r"><rect x="9" y="10" width="6" height="30" fill="#94a3b8" rx="2" /></g>
+                                                            <!-- Held Ball -->
+                                                            <circle cx="0" cy="35" r="10" fill="#facc15" class="full-held-ball" />
+                                                        </g>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- Top View Panel -->
+                            <div class="bg-gray-900 rounded-xl p-2 flex flex-col justify-center overflow-hidden h-80 border border-gray-800 relative">
+                                <span class="absolute top-2 left-2 text-[10px] text-gray-500 font-bold uppercase z-10">Top View (Base Yaw)</span>
+                                <svg viewBox="0 0 500 400" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="50" y="50" width="400" height="300" fill="#334155" rx="10" />
+                                    
+                                    <!-- Bins (Green Bin at 70, 196) -->
+                                    <rect x="50" y="170" width="50" height="50" fill="#22c55e" rx="5" />
+                                    <rect x="50" y="240" width="50" height="50" fill="#ef4444" rx="5" />
+                                    <rect x="50" y="100" width="50" height="50" fill="#3b82f6" rx="5" />
+                                    
+                                    <!-- Base Pivot at 250, 300 -->
+                                    <g transform="translate(250, 300)">
+                                        <circle cx="0" cy="0" r="40" fill="#1e293b" />
+                                        <g class="full-base">
+                                            <!-- Arm fully extended projection -->
+                                            <rect x="-15" y="-120" width="30" height="120" fill="#64748b" rx="5" />
+                                            <circle cx="0" cy="-120" r="18" fill="#1e293b" />
+                                            <rect x="-10" y="-208" width="20" height="88" fill="#94a3b8" rx="5" />
+                                            <!-- Held Ball in top view -->
+                                            <circle cx="0" cy="-208" r="10" fill="#facc15" class="full-held-ball" />
+                                        </g>
+                                    </g>
+                                    <!-- Ball on table top view (Radius 208 from Base) -> 250, 92 -->
+                                    <circle cx="250" cy="92" r="10" fill="#facc15" class="full-table-ball" />
+                                    <!-- Ball dropping into Green bin -->
+                                    <circle cx="70" cy="196" r="10" fill="#facc15" class="full-bin-ball" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active', 'border-blue-500', 'text-blue-700');
+                el.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Highlight selected button
+            const btn = document.getElementById('btn-' + tabId);
+            btn.classList.add('active', 'border-blue-500', 'text-blue-700');
+            btn.classList.remove('border-transparent', 'text-gray-500');
+        }
+    </script>
+</body>
+</html>

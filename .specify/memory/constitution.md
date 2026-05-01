@@ -1,50 +1,52 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: [TEMPLATE] -> 1.0.0
+- Modified principles:
+  - [PRINCIPLE_1_NAME] -> I. Simulation First
+  - [PRINCIPLE_2_NAME] -> II. Readability Over Micro-Optimization
+  - [PRINCIPLE_3_NAME] -> III. Comprehensive Documentation
+  - Removed PRINCIPLE_4 and PRINCIPLE_5 from template
+- Added sections: None
+- Removed sections: None
+- Templates requiring updates (⚠ pending):
+  - .specify/templates/plan-template.md (Needs simulation testing added as a Constitution Check gate)
+  - .specify/templates/tasks-template.md (Needs documentation and simulation steps formalized)
+- Follow-up TODOs: None
+-->
+# Robotic Arm with Object Sorting Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Simulation First
+All physical movements, algorithms, and control logic MUST be tested and verified in a simulation or dry-run environment before being deployed to the physical robotic arm.
+*Rationale: Prevents physical damage to the hardware components, verifies path planning and kinematics, and ensures baseline functionality without risking the physical equipment.*
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Readability Over Micro-Optimization
+Code MUST be easily readable and understandable by all team members (Hardware, Software, Integration). Clear, maintainable logic and expressive variable names are prioritized over saving minimal memory or CPU cycles.
+*Rationale: As a collaborative college project with cross-functional roles, understandable code facilitates easier debugging, code reviews, and smoother handoffs between team members.*
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Comprehensive Documentation
+Every function, control interface, and hardware wiring configuration MUST be strictly documented. Changes to pinouts or control signals must be reflected in the documentation immediately.
+*Rationale: Ensures that hardware and software engineers stay in sync. Outdated or missing documentation leads to integration failures and wasted debugging time.*
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+## Constraints & Standards
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+- Hardware constraints (e.g., motor torque limits, sensor accuracy) must be clearly stated in the documentation.
+- Software should follow a uniform styling guide to support the Readability principle.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Development Workflow & Quality Gates
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- **Simulation Gate**: Code cannot be merged or deployed to hardware without a video or log proving successful simulation.
+- **Review Gate**: All new code MUST be peer-reviewed for readability and documentation compliance. A feature is only considered "Done" if it passes simulation tests successfully and the corresponding hardware/software documentation is fully updated.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This Constitution supersedes all other practices for the Robotic Arm with Object Sorting project. 
+Amendments require team discussion, documentation of the change, and a version bump according to Semantic Versioning:
+- MAJOR: Backward incompatible governance/principle removals.
+- MINOR: New principle/section added.
+- PATCH: Clarifications and wording fixes.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+All PRs/reviews must verify compliance with these core principles.
+
+**Version**: 1.0.0 | **Ratified**: 2026-05-01 | **Last Amended**: 2026-05-01

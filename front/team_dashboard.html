@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotics Subsystems Integration Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .active-tab { 
+            background-color: #f8fafc; 
+            border-left-width: 4px;
+            border-left-color: #3b82f6; 
+            color: #1d4ed8 !important; 
+            font-weight: 600; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased selection:bg-blue-200 selection:text-blue-900">
+    
+    <!-- Main Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-10">
+                    <h1 class="text-2xl font-bold text-gray-900">Robotics Arm <span class="text-gray-400 font-normal">| المشروع</span></h1>
+                    <nav class="flex space-x-6">
+                        <a href="team_dashboard.html" class="text-blue-600 font-bold border-b-2 border-blue-600">Team Dashboard</a>
+                        <a href="system_diagrams.html" class="text-gray-500 hover:text-blue-600 font-medium transition-colors">System Diagrams</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Huge Header with Static Image -->
+    <header class="relative w-full h-80 bg-gray-900 overflow-hidden shadow-xl border-b border-gray-200">
+        <!-- Using a high-quality robotics stock image as placeholder -->
+        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Robotic Arm Automation" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent"></div>
+        <div class="relative z-10 flex flex-col items-center justify-end h-full text-center pb-12 px-4">
+            <span class="px-3 py-1 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest rounded-full mb-4 shadow-lg">Python Stack Project</span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 tracking-tight drop-shadow-md">Robotic Arm: Object Sorting</h1>
+            <p class="text-lg md:text-xl text-gray-300 max-w-2xl font-light">Team Integration & Subsystems Architecture Dashboard</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row gap-8">
+        
+        <!-- Sidebar Navigation (List on the side) -->
+        <aside class="md:w-1/3 lg:w-1/4">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-8">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center">
+                    <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Subsystem Teams</h2>
+                </div>
+                <nav id="sidebar-nav" class="flex flex-col">
+                    <button onclick="selectTeam('vision')" class="team-btn text-left px-6 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent active-tab" data-target="vision">1. Computer Vision</button>
+                    <button onclick="selectTeam('kinematics')" class="team-btn text-left px-6 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent border-t border-gray-100" data-target="kinematics">2. Kinematics & Simulation</button>
+                    <button onclick="selectTeam('embedded')" class="team-btn text-left px-6 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent border-t border-gray-100" data-target="embedded">3. Embedded Hardware</button>
+                    <button onclick="selectTeam('power')" class="team-btn text-left px-6 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent border-t border-gray-100" data-target="power">4. Power Supply</button>
+                    <button onclick="selectTeam('structure')" class="team-btn text-left px-6 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent border-t border-gray-100" data-target="structure">5. Structure & Frame</button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <section class="md:w-2/3 lg:w-3/4">
+            
+            <!-- 1. Vision Content -->
+            <div id="content-vision" class="content-section fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-10">
+                    <div class="inline-flex items-center justify-center p-4 bg-indigo-100 rounded-xl mb-6 shadow-inner">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Computer Vision Team</h2>
+                    <p class="text-gray-500 mb-8 text-lg font-light">Responsible for giving the robot its "eyes" using Python and OpenCV.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Responsibilities</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-indigo-500 mr-2">✓</span> Camera setup and lens distortion calibration.</li>
+                                <li class="flex"><span class="text-indigo-500 mr-2">✓</span> Color filtering (HSV masking) and size detection.</li>
+                                <li class="flex"><span class="text-indigo-500 mr-2">✓</span> Mapping 2D pixel coordinates to 3D workspace coordinates.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Key Tasks</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Write <code>detector.py</code> to stream the webcam feed.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Implement contour tracking and object bounding boxes.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Output a clean <code>(X, Y, Color)</code> data payload.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Integration Highlight -->
+                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-xl relative overflow-hidden">
+                        <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
+                            <svg class="w-32 h-32 text-indigo-900" fill="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-indigo-900 mb-4 flex items-center relative z-10">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Integration Focus (CRITICAL)
+                        </h3>
+                        <p class="text-indigo-900 leading-relaxed relative z-10">
+                            <strong class="text-indigo-950 block mb-1">To Kinematics:</strong> You must stream your 3D target coordinates to the Kinematics team. If your math is off, the arm will miss the object entirely.<br><br>
+                            <strong class="text-indigo-950 block mb-1">With Structure:</strong> You rely heavily on the Structure team to mount the camera at a fixed, unmoving height so your coordinate conversion formula stays perfectly calibrated.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Kinematics Content -->
+            <div id="content-kinematics" class="content-section hidden fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-10">
+                    <div class="inline-flex items-center justify-center p-4 bg-teal-100 rounded-xl mb-6 shadow-inner">
+                        <svg class="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Kinematics & Simulation Team</h2>
+                    <p class="text-gray-500 mb-8 text-lg font-light">The "Brain" of the operation. Translates vision data into physical arm movements using PyBullet.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Responsibilities</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-teal-500 mr-2">✓</span> Inverse Kinematics (IK) calculations.</li>
+                                <li class="flex"><span class="text-teal-500 mr-2">✓</span> Path planning and collision avoidance.</li>
+                                <li class="flex"><span class="text-teal-500 mr-2">✓</span> Managing the PyBullet dry-run simulation environment.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Key Tasks</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Load the robot's URDF model into PyBullet.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Write the pick-and-place looping logic.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Create the <code>serial_handler.py</code> stub to format commands.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-teal-50 border-l-4 border-teal-500 p-6 rounded-r-xl relative overflow-hidden">
+                        <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
+                            <svg class="w-32 h-32 text-teal-900" fill="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-teal-900 mb-4 flex items-center relative z-10">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Integration Focus (CRITICAL)
+                        </h3>
+                        <p class="text-teal-900 leading-relaxed relative z-10">
+                            <strong class="text-teal-950 block mb-1">From Vision:</strong> You rely on Vision to provide accurate (X,Y) targets to feed into your IK solver.<br><br>
+                            <strong class="text-teal-950 block mb-1">To Embedded:</strong> Once the path is proven safe in simulation, you must convert the joint angles into Serial String Commands (e.g., <code>M 120 45 90</code>) and transmit them over USB to the Embedded team's Arduino.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Embedded Content -->
+            <div id="content-embedded" class="content-section hidden fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-10">
+                    <div class="inline-flex items-center justify-center p-4 bg-emerald-100 rounded-xl mb-6 shadow-inner">
+                        <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Embedded Hardware Team</h2>
+                    <p class="text-gray-500 mb-8 text-lg font-light">The muscle control. Responsible for the C++ code running directly on the Arduino microcontroller.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Responsibilities</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-emerald-500 mr-2">✓</span> Real-time motor control and PID tuning.</li>
+                                <li class="flex"><span class="text-emerald-500 mr-2">✓</span> Parsing Serial commands from the Python host.</li>
+                                <li class="flex"><span class="text-emerald-500 mr-2">✓</span> Implementing hardware interrupts for the Emergency Stop.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Key Tasks</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Flash Arduino with firmware to control stepper/servo drivers.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Wire up limit switches for the Homing sequence.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Translate generic angles to specific motor step pulses.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl relative overflow-hidden">
+                        <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
+                            <svg class="w-32 h-32 text-emerald-900" fill="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-emerald-900 mb-4 flex items-center relative z-10">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Integration Focus (CRITICAL)
+                        </h3>
+                        <p class="text-emerald-900 leading-relaxed relative z-10">
+                            <strong class="text-emerald-950 block mb-1">From Kinematics:</strong> You must strictly follow the Serial Protocol contract defined by the Kinematics team. If they send `M 90`, your parser must know that means Move 90 degrees.<br><br>
+                            <strong class="text-emerald-950 block mb-1">With Power Supply:</strong> You rely heavily on the Power team to supply stable logic voltage (5V/3.3V) and motor voltage (12V/24V) without interference or brownouts.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Power Supply Content -->
+            <div id="content-power" class="content-section hidden fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-10">
+                    <div class="inline-flex items-center justify-center p-4 bg-orange-100 rounded-xl mb-6 shadow-inner">
+                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Power Supply Team</h2>
+                    <p class="text-gray-500 mb-8 text-lg font-light">The lifeblood of the system. Ensures stable, safe power distribution to all components.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Responsibilities</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-orange-500 mr-2">✓</span> Voltage regulation and buck converters.</li>
+                                <li class="flex"><span class="text-orange-500 mr-2">✓</span> Total system amperage calculation and wire gauging.</li>
+                                <li class="flex"><span class="text-orange-500 mr-2">✓</span> Electrical safety and Emergency Stop relay wiring.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Key Tasks</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Design a custom PCB or wiring harness for power distribution.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Wire the physical red Emergency Stop button to cut motor power.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Ground all components to a common ground to prevent signal noise.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-xl relative overflow-hidden">
+                        <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
+                            <svg class="w-32 h-32 text-orange-900" fill="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-orange-900 mb-4 flex items-center relative z-10">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Integration Focus (CRITICAL)
+                        </h3>
+                        <p class="text-orange-900 leading-relaxed relative z-10">
+                            <strong class="text-orange-950 block mb-1">With Embedded:</strong> You must provide clean power. A sudden voltage drop when a motor starts moving will reset the Arduino, ruining the operation.<br><br>
+                            <strong class="text-orange-950 block mb-1">With Structure:</strong> You need to collaborate with the Structure team to ensure there is physical space and mounting points for heavy batteries and power supplies inside the base.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Structure Content -->
+            <div id="content-structure" class="content-section hidden fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-10">
+                    <div class="inline-flex items-center justify-center p-4 bg-gray-200 rounded-xl mb-6 shadow-inner">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Structure & Frame Team</h2>
+                    <p class="text-gray-500 mb-8 text-lg font-light">The physical foundation. Responsible for the mechanical integrity of the arm and workspace.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-10">
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Responsibilities</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-gray-500 mr-2">✓</span> Physical frame, motor mounts, and bearing alignment.</li>
+                                <li class="flex"><span class="text-gray-500 mr-2">✓</span> Camera stand and workspace table design.</li>
+                                <li class="flex"><span class="text-gray-500 mr-2">✓</span> Sorting bins and mechanical gripper design.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Key Tasks</h3>
+                            <ul class="space-y-3 text-gray-700 list-none">
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> CAD Modeling (SolidWorks/Fusion360).</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> 3D Printing, laser cutting, and physical assembly.</li>
+                                <li class="flex"><span class="text-gray-400 mr-2">➔</span> Generating the physical measurements (link lengths) for the software.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-100 border-l-4 border-gray-400 p-6 rounded-r-xl relative overflow-hidden">
+                        <div class="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
+                            <svg class="w-32 h-32 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-gray-800 mb-4 flex items-center relative z-10">
+                            <svg class="w-6 h-6 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Integration Focus (CRITICAL)
+                        </h3>
+                        <p class="text-gray-700 leading-relaxed relative z-10">
+                            <strong class="text-gray-900 block mb-1">To Kinematics:</strong> You must measure the exact distance between joints (in millimeters) and provide this data to the Kinematics team. If your CAD model differs from the printed part, their math will fail.<br><br>
+                            <strong class="text-gray-900 block mb-1">To Vision:</strong> The camera mount must be perfectly rigid. If the camera shakes or droops over time, the Vision team's calibration is ruined.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="mt-12 py-8 bg-gray-900 text-center border-t border-gray-800">
+        <p class="text-gray-400 text-sm">Robotics Engineering Project Dashboard &bull; System Architecture Documentation</p>
+    </footer>
+
+    <!-- JavaScript for Tab Switching -->
+    <script>
+        function selectTeam(teamId) {
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+                // Force reflow to restart animation on next show
+                void el.offsetWidth;
+            });
+            
+            // Show selected content section
+            document.getElementById('content-' + teamId).classList.remove('hidden');
+            
+            // Update sidebar active states
+            document.querySelectorAll('.team-btn').forEach(btn => {
+                if(btn.dataset.target === teamId) {
+                    btn.classList.add('active-tab');
+                    btn.classList.remove('border-transparent', 'text-gray-600');
+                } else {
+                    btn.classList.remove('active-tab');
+                    btn.classList.add('border-transparent', 'text-gray-600');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
